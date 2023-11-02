@@ -15,7 +15,7 @@ function App() {
 
     async function fetchParkingLotDetails() {
         try {
-            const response = await fetch('http://localhost:5000/parking-lot');
+            const response = await fetch('https://intellipark.onrender.com/parking-lot');
             return response.json();
         } catch (error) {
             console.log(error);
@@ -23,7 +23,7 @@ function App() {
     }
 
     React.useEffect(() => {
-        const socket = io('http://localhost:5000', {
+        const socket = io('https://intellipark.onrender.com', {
             autoConnect: false
         });
 
