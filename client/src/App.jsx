@@ -24,7 +24,8 @@ function App() {
 
     React.useEffect(() => {
         const socket = io('https://intellipark.onrender.com', {
-            autoConnect: false
+            autoConnect: false,
+            transports: ["websocket"]
         });
 
         socket.connect();
