@@ -70,3 +70,14 @@ server.listen(port, (error) => {
     else
         console.log(`Server is running on port ${port}.`);
 });
+
+process.on("SIGINT", () => {
+    dbConnection.end((error) => {
+        if (error) {
+            console.log("Error closing MySQL database connection.");
+        } else {
+            console.log("MySQL database connection closed.");
+            process.exit(0); 
+        }
+    });
+});
