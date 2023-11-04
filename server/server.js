@@ -52,6 +52,8 @@ dbConnection.connect((error) => {
 
 io.on("connect", (socket) => {
     socket.on("parking-status", async (details) => {
+        console.log(details.parkingLotId);
+        console.log(details.isOccupied);
         console.log(details);
 
         try {
