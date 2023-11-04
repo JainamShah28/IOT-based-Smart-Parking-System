@@ -59,11 +59,8 @@ io.on("connect", (socket) => {
         try {
             const { parkingLotId, isOccupied } = details;
 
-            if (parkingLotId && typeof isOccupied === "boolean") {
-                await dbConnection.promise().query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
-                console.log("*");
-                io.emit("display-status", { parkingLotId, isOccupied });
-            }
+            await dbConnection.promise().query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
+            io.emit("display-status", { parkingLotId, isOccupied });
         } catch (error) {
             console.log(error);
         }
