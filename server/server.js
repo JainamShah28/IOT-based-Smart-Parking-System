@@ -29,8 +29,6 @@ app.use(cors({
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use(dbConnectionErrorHandler);
-
 app.use("/parking-lot", parkingLotRoutes);
 
 app.all("*", (request, response) => {
