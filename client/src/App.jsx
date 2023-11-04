@@ -31,6 +31,8 @@ function App() {
         socket.connect();
 
         socket.on("display-status", (updatedDetails) => {
+            console.log(updatedDetails);
+            
             setParkingLots(parkingLots => {
                 return parkingLots.map(parkingLot => {
                     if (parkingLot.parkingLotId === updatedDetails.parkingLotId) {
