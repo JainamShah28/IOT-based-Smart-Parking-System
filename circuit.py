@@ -1,38 +1,37 @@
 import RPi.GPIO as GPIO
 import time 
+import json 
+import socketio 
+
+sio = socketio.SimpleClient()
+sio.connect('https://intellipark.onrender.com', transport = ['websocket'])
 
 GPIO.setmode(GPIO.BOARD)
 
-triggerPins = []
-echoPins = []
-distances = [0 for i in range(0, len(triggerPins))]
+usPins = [11, 12, 13, 15]
+parkingLotIds = ["A1", "A2", "A3", "A4"]
+prevStates = [False for i in range(0, len(usPins))]
+
+for pin in usPins:
+    GPIO.setup(pin, GPIO.IN)
 
 try:
-    for pin in triggerPins:
-        GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, GPIO.LOW)
-
-    for pin in echoPins:
-        GPIO.setup(pin, GPIO.IN)
-
     while True:
-        for i in range(0, len(triggerPins)):
-            GPIO.output(triggerPins[i], GPIO.HIGH)
-            time.sleep(0.00001)
-            GPIO.output(triggerPins[i], GPIO.LOW)
+        currStates = []
 
-            while GPIO.input(echoPins[i]) == GPIO.LOW:
-                startTime = time.time()
+        for i in range(0, len(usPins)):
+            usOutput = GPIO.input(usPins[i])
+            currStates.append(usOutput == 1)
 
-            while GPIO.input(echoPins[i]) == GPIO.HIHJ:
-                endTime = time.time()
+            if currStates[i] != prevStates[i]:
+                sio.emit("parking-status", json.dumps({
+                    "parkingLotId": parkingLotIds[i],
+                    "isOccupied": currStates[i] == 1
+                }))
 
-            duration = endTime - startTime
-            distance = duration * 17000
+                prevStates[i] = currStates[i]
 
-            if (distance != distances[i]):
-                distances[i] = distance
-                # emmit the server socekt event to send the data to the server 
-                continue
+        time.sleep(1)
 except KeyboardInterrupt:
+    sio.disconnect()
     GPIO.cleanup()
