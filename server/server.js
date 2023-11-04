@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
@@ -57,7 +57,7 @@ io.on("connect", (socket) => {
         console.log(details);
 
         try {
-            const { parkingLotId, isOccupied } = details;
+            const { parkingLotId, isOccupied } = JSON.parse(details);
 
             await dbConnection.promise().query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
             io.emit("display-status", { parkingLotId, isOccupied });
