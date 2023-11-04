@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import dbConnection from "./config/dbConnect.js";
 
 import errorHandler from "./middlewares/errorHandler.js";
+import dbConnectionErrorHandler from "./middlewares/dbConnectErrorHandler.js";
 
 import parkingLotRoutes from "./routes/parkingLotRoutes.js";
 
@@ -27,6 +28,8 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(morgan("dev"));
+
+app.use(dbConnectionErrorHandler);
 
 app.use("/parking-lot", parkingLotRoutes);
 
@@ -52,7 +55,7 @@ dbConnection.connect((error) => {
 io.on("connect", (socket) => {
     socket.on("parking-status", async (details) => {
         console.log(details);
-        
+
         try {
             const { parkingLotId, isOccupied } = details;
 
