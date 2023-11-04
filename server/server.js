@@ -8,7 +8,6 @@ import { Server } from "socket.io";
 import dbConnection from "./config/dbConnect.js";
 
 import errorHandler from "./middlewares/errorHandler.js";
-import dbConnectionErrorHandler from "./middlewares/dbConnectErrorHandler.js";
 
 import parkingLotRoutes from "./routes/parkingLotRoutes.js";
 
@@ -52,10 +51,6 @@ dbConnection.connect((error) => {
 
 io.on("connect", (socket) => {
     socket.on("parking-status", async (details) => {
-        console.log(details.parkingLotId);
-        console.log(details.isOccupied);
-        console.log(details);
-
         try {
             const { parkingLotId, isOccupied } = JSON.parse(details);
 
