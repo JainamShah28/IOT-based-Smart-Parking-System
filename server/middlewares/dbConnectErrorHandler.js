@@ -1,4 +1,4 @@
-import dbConnection from "../config/dbConnect";
+import dbConnection from "../config/dbConnect.js";
 
 function dbConnectErrorHandler(request, response, next) {
     if (dbConnection.state === "disconnected") {
