@@ -32,6 +32,7 @@ try:
                 prevStates[i] = currStates[i]
 
         time.sleep(1)
+        
 except KeyboardInterrupt:
     sio.disconnect()
     GPIO.cleanup()
