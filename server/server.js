@@ -52,6 +52,16 @@ dbConnection.connect((error) => {
 io.on("connect", (socket) => {
     socket.on("parking-status", async (details) => {
         try {
+            if (dbConnection.state === 'disconnected') {
+                dbConnection.connect((error) => {
+                    if (error) {
+                        console.log("Failed to reconnect to the MySQL database.");
+                    } else {
+                        console.log("Reconnected to the MySQL database.");
+                    }
+                });
+            }
+
             const { parkingLotId, isOccupied } = JSON.parse(details);
 
             await dbConnection.promise().query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
@@ -61,6 +71,7 @@ io.on("connect", (socket) => {
         }
     });
 });
+
 
 server.listen(port, (error) => {
     if (error)
