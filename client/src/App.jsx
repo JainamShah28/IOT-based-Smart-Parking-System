@@ -31,8 +31,6 @@ function App() {
         socket.connect();
 
         socket.on("display-status", (updatedDetails) => {
-            console.log(updatedDetails);
-            
             setParkingLots(parkingLots => {
                 return parkingLots.map(parkingLot => {
                     if (parkingLot.parkingLotId === updatedDetails.parkingLotId) {
@@ -44,13 +42,6 @@ function App() {
 
                     return parkingLot;
                 });
-            });
-
-            setParkingLotsStatus(() => {
-                const occupied = parkingLots.filter(parkingLot => parkingLot.isOccupied === true).length,
-                    notOccupied = parkingLots.length - occupied;
-
-                return { occupied, notOccupied };
             });
         });
 
@@ -69,6 +60,13 @@ function App() {
             socket.disconnect();
         }
     }, []);
+
+    React.useEffect(() => {
+        const occupied = parkingLots.filter(parkingLot => parkingLot.isOccupied === true).length,
+            notOccupied = parkingLots.length - occupied;
+
+        setParkingLotsStatus({ occupied, notOccupied });
+    }, [parkingLots]);
 
     return (
         <main className="App w-screen min-h-screen flex flex-col">
