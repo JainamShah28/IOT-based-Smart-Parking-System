@@ -53,13 +53,15 @@ dbPool.getConnection((error, connection) => {
 
 io.on("connect", (socket) => {
     socket.on("parking-status", async (details) => {
+        console.log(details);
+        
         try {
             const { parkingLotId, isOccupied } = JSON.parse(details),
                 connection = await dbPool.getConnection();
 
             await connection.query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
             connection.release();
-            
+
             io.emit("display-status", { parkingLotId, isOccupied });
         } catch (error) {
             console.log(error);
