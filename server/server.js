@@ -1,11 +1,11 @@
-import express, { json } from "express";
+import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
 
-import dbConnection from "./config/dbConnect.js";
+import dbPool from "./config/dbConnect.js";
 
 import errorHandler from "./middlewares/errorHandler.js";
 
@@ -42,29 +42,24 @@ app.all("*", (request, response) => {
 
 app.use(errorHandler);
 
-dbConnection.connect((error) => {
+dbPool.getConnection((error, connection) => {
     if (error)
         console.log("Failed to connect with MySQL database.");
-    else
-        console.log("MySQL database is connected.")
+    else {
+        console.log("MySQL database is connected.");
+        connection.release();
+    }
 });
 
 io.on("connect", (socket) => {
     socket.on("parking-status", async (details) => {
         try {
-            if (dbConnection.state === 'disconnected') {
-                dbConnection.connect((error) => {
-                    if (error) {
-                        console.log("Failed to reconnect to the MySQL database.");
-                    } else {
-                        console.log("Reconnected to the MySQL database.");
-                    }
-                });
-            }
+            const { parkingLotId, isOccupied } = JSON.parse(details),
+                connection = await dbPool.getConnection();
 
-            const { parkingLotId, isOccupied } = JSON.parse(details);
-
-            await dbConnection.promise().query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
+            await connection.query(`UPDATE ParkingLot SET isOccupied = ${isOccupied} WHERE parkingLotId = "${parkingLotId}"`);
+            connection.release();
+            
             io.emit("display-status", { parkingLotId, isOccupied });
         } catch (error) {
             console.log(error);
@@ -81,12 +76,12 @@ server.listen(port, (error) => {
 });
 
 process.on("SIGINT", () => {
-    dbConnection.end((error) => {
+    dbPool.end((error) => {
         if (error) {
-            console.log("Error closing MySQL database connection.");
+            console.error("Error closing MySQL connection pool.");
         } else {
-            console.log("MySQL database connection closed.");
-            process.exit(0); 
+            console.log("MySQL connection pool closed.");
+            process.exit(0);
         }
     });
 });

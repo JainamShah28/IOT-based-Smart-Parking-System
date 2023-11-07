@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 
 const dbConfig = {
     host: process.env.DATABASE_HOST,
@@ -10,6 +10,6 @@ const dbConfig = {
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 },
-    dbConnection = mysql.createConnection(dbConfig);
+    dbPool = mysql.createPool(dbConfig);
 
-export default dbConnection;
+export default dbPool;
