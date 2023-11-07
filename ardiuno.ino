@@ -1,4 +1,4 @@
-int triggerPins[4] = {};
+int triggerPins[4] = {10, 11, 12, 13};
 int echoPins[4] = {};
 int outputPins[4] = {};
 
